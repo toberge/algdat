@@ -65,21 +65,9 @@ public class BracketStacker {
                 if (i > -1) {
                     if (stack.isEmpty()) return false; // we have end bracket but no start in stack
                     char fromStack = stack.pop();
-                    Stack<Character> endStack = new Stack<>();
-                    while (fromStack != starts[i]) { // while what we pop is not equal to corresponding start
-                        if (whichEnd(fromStack) > -1) {
-                            endStack.push(fromStack); // another end
-                        } else if (whichStart(fromStack) > -1) {
-                            int j = whichStart(fromStack);
-                            if (!endStack.isEmpty() && starts[j] == endStack.pop()) {
-                                // found the start in our end stack
-                            } else if (endStack.isEmpty() && starts[j] == starts[i]) {
-                                break; // found the start we went looking for, end while!
-                            } else {
-                                return false; // none of our okay-ing tests got triggered, it's a bad one
-                            }
-                        }
-                        fromStack = stack.pop();
+                    int j = whichStart(fromStack);
+                    if (j < 0 || starts[i] != starts[j]) {
+                        return false; // this end should have its matching start on the stack
                     }
                 }
 
