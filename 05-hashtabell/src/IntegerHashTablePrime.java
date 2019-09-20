@@ -19,7 +19,6 @@ public class IntegerHashTablePrime {
             n++;
             return index;
         } else { // collision
-            //System.out.println("COLLISION");
             int jumpInterval = hashInterval(key); // needing jump value
             collisions++;
             for (int i = 0; i < m; i++) {

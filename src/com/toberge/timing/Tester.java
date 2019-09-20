@@ -16,7 +16,7 @@ public class Tester {
     private static final int DEFAULT_MSLIMIT = 1000;
     private static boolean verbose = true;
 
-    public static void setMode(boolean verbose) {
+    public static void setVerbose(boolean verbose) {
         Tester.verbose = verbose;
     }
 

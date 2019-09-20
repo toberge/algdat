@@ -1,4 +1,3 @@
-import com.toberge.data.DirectedNode;
 import com.toberge.data.LinkedList;
 import com.toberge.util.ExtraMath;
 
@@ -10,11 +9,32 @@ public class StringHashTable {
     private int collisions = 0;
 
     public StringHashTable(int capacity) {
-//        BigInteger big = new BigInteger(String.valueOf(capacity /*+ capacity / 6*/)); // 1/6 more, but I should refrain according to oppgavetekst
-//        m = Integer.parseInt(big.nextProbablePrime().toString()); // next prime
         m = ExtraMath.nextPrime(capacity);
         array = new LinkedList[m];
     }
+
+    /*
+SIMPLY MULTIPLYING BY INDEX
+n=96, m=97
+Lastfaktor 0.9896907216494846
+Collisions: 33
+Avg collisions per name: 0.34375
+Fill rate: 0.6494845360824743
+
+MULTIPLYING BY 3 to the index-th
+n=96, m=97
+Lastfaktor 0.9896907216494846
+Collisions: 35
+Avg collisions per name: 0.3645833333333333
+Fill rate: 0.6288659793814433
+
+MULTIPLYING BY 2 to the index-th
+n=96, m=97
+Lastfaktor 0.9896907216494846
+Collisions: 42
+Avg collisions per name: 0.4375
+Fill rate: 0.5567010309278351
+     */
 
     private int stringValue(String string) {
         char[] chars = string.toCharArray();
@@ -22,6 +42,7 @@ public class StringHashTable {
         int multiplier = 1;
 
         // weighting the characters with 3^i
+        // no, actually just their position seems to work marginally better in this case
         for (char c : chars) {
             //value += 3 * multiplier * Character.getNumericValue(c); WHOOPS
             //multiplier *= 3; // no multiplier makes the avg collision rate *slightly* worse,
@@ -86,19 +107,11 @@ public class StringHashTable {
         StringBuilder builder = new StringBuilder();
         for (LinkedList<String> list : array) {
             if (list != null) {
-                /*DirectedNode<String> current = list.getHead();
-                builder.append(current.getValue());
-                while (current.getNext() != null) {
-                    builder.append(System.lineSeparator());
-                    builder.append(current.getValue());
-                    current = current.getNext();
-                }*/
                 builder.append(list);
             } else {
                 builder.append("NO ITEM");
             }
             builder.append(System.lineSeparator());
-//            builder.append(System.lineSeparator());
         }
         return builder.toString();
     }

@@ -2,7 +2,6 @@ import com.toberge.timing.Tester;
 import com.toberge.util.ArrayFactory;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -30,6 +29,14 @@ public class HashRunner {
             table.add(string);
         }
 
+        for (String string : strings) {
+            if (!table.contains(string)) {
+                System.err.println("we dun goofed at adding them strings");
+                System.exit(1);
+            }
+        }
+        System.out.println("Names added, adding verified.");
+
         System.out.println("n=" + table.getN()  + ", m=" + table.getM());
         System.out.println("Lastfaktor " + ((double)table.getN() / table.getM()));
         System.out.println("Collisions: " + table.getCollisions());
@@ -49,7 +56,7 @@ public class HashRunner {
         int[] array = ArrayFactory.generateNonzeroIntegerArray(NUMBER, 900000000); // vast range of numberkind
 
 
-        Tester.setMode(true);
+        Tester.setVerbose(true);
         double expMS = Tester.test(() -> {
             HashRunner.integerHashTableExponent = new IntegerHashTableExponent(NUMBER);
             for (int key : array) {
@@ -64,7 +71,7 @@ public class HashRunner {
         System.out.println("Fill rate: " + integerHashTableExponent.getFillRate());
 
         System.out.println("--------- INTEGERS x 5 million using PRIME ---------");
-        System.out.println("     aka just 20% more than 5M but somehow worse    ");
+        System.out.println("     aka just 25% more than 5M but somehow worse    ");
 
         double primeMS = Tester.test(() -> {
             HashRunner.integerHashTablePrime = new IntegerHashTablePrime(NUMBER);
@@ -89,10 +96,6 @@ public class HashRunner {
         }, MS_LIMIT);
 
         System.out.println("Size: " + hashMap.size());
-
-        double[] contestants = new double[]{hashMapMS, expMS, primeMS};
-        Arrays.sort(contestants);
-        System.out.println("Winner spent " + contestants[2] + " ms");
 
     }
 }
