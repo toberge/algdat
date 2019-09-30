@@ -2,17 +2,17 @@ package com.toberge.data;
 
 public class LinkedList<T> {
 
-    private DirectedNode<T> head = null;
+    private LinkedElement<T> head = null;
     private int size = 0;
 
     public LinkedList(T head) {
-        this.head = new DirectedNode<>(head);
+        this.head = new LinkedElement<>(head);
         size = 1;
     }
 
     public LinkedList() {}
 
-    public DirectedNode<T> getHead() {
+    public LinkedElement<T> getHead() {
         return head;
     }
 
@@ -25,14 +25,14 @@ public class LinkedList<T> {
      * @param element
      */
     public void insert(T element) {
-        DirectedNode<T> newHead = new DirectedNode<>(element);
+        LinkedElement<T> newHead = new LinkedElement<>(element);
         newHead.setNext(head);
         head = newHead;
         size++;
     }
 
     public boolean contains(T element) {
-        DirectedNode<T> current = head;
+        LinkedElement<T> current = head;
         while (current != null) { // fixed bug
             if (current.getValue().equals(element)) {
                 return true;
@@ -43,8 +43,8 @@ public class LinkedList<T> {
     }
 
     public void remove(T element) {
-        DirectedNode<T> previous = null;
-        DirectedNode<T> current = head;
+        LinkedElement<T> previous = null;
+        LinkedElement<T> current = head;
         while (current != null) {
             if (current.getValue().equals(element)) {
                 if (previous == null) {

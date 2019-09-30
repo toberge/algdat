@@ -1,4 +1,4 @@
-import com.toberge.data.DirectedNode;
+import com.toberge.data.LinkedElement;
 
 /**
  * Solving Josephus' Problem using a
@@ -13,14 +13,14 @@ import com.toberge.data.DirectedNode;
  */
 public class WorseCircularList {
 
-    private DirectedNode<Integer> head;
+    private LinkedElement<Integer> head;
 
     public WorseCircularList(int n) {
-        this.head = new DirectedNode<>(1);
-        DirectedNode<Integer> current = this.head;
+        this.head = new LinkedElement<>(1);
+        LinkedElement<Integer> current = this.head;
 
         for (int i = 2; i <= n; i++) {
-            current.setNext(new DirectedNode<>(i));
+            current.setNext(new LinkedElement<>(i));
             current = current.getNext();
         }
         current.setNext(this.head);
@@ -31,7 +31,7 @@ public class WorseCircularList {
         return head.getNext() != null;
     }
 
-    public DirectedNode<Integer> getHead() {
+    public LinkedElement<Integer> getHead() {
         return head;
     }
 
@@ -40,7 +40,7 @@ public class WorseCircularList {
     }
 
     public void remove() {
-        DirectedNode<Integer> current = head;
+        LinkedElement<Integer> current = head;
         while (current.getNext() != head) {
             current = current.getNext();
         }
@@ -49,7 +49,7 @@ public class WorseCircularList {
     }
 
     public int size() {
-        DirectedNode<Integer> current = head;
+        LinkedElement<Integer> current = head;
         int count = 1;
         while (current.getNext() != null && current.getNext() != head) {
             current = current.getNext();

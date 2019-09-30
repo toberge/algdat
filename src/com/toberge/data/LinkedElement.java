@@ -1,14 +1,14 @@
 package com.toberge.data;
 
-public class DirectedNode<T> {
+public class LinkedElement<T> {
     private T value;
-    private DirectedNode<T> next = null;
+    private LinkedElement<T> next = null;
 
-    public DirectedNode(T value) {
+    public LinkedElement(T value) {
         this.value = value;
     }
 
-    public DirectedNode(T value, DirectedNode<T> next) {
+    public LinkedElement(T value, LinkedElement<T> next) {
         this.value = value;
         this.next = next;
     }
@@ -17,11 +17,11 @@ public class DirectedNode<T> {
         return this.value;
     }
 
-    public DirectedNode<T> getNext() {
+    public LinkedElement<T> getNext() {
         return next;
     }
 
-    public void setNext(DirectedNode<T> next) {
+    public void setNext(LinkedElement<T> next) {
         this.next = next;
     }
 

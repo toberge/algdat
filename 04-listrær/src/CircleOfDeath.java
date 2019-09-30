@@ -1,4 +1,4 @@
-import com.toberge.data.DoublyDirectedNode;
+import com.toberge.data.DoublyLinkedElement;
 
 /**
  * Solving Josephus' Problem using a
@@ -8,16 +8,16 @@ import com.toberge.data.DoublyDirectedNode;
  */
 public class CircleOfDeath {
 
-    private DoublyDirectedNode<Integer> head;
+    private DoublyLinkedElement<Integer> head;
     private int count;
 
     public CircleOfDeath(int n) {
         count = n;
-        this.head = new DoublyDirectedNode<>(1);
-        DoublyDirectedNode<Integer> current = this.head;
+        this.head = new DoublyLinkedElement<>(1);
+        DoublyLinkedElement<Integer> current = this.head;
 
         for (int i = 2; i <= n; i++) {
-            current.setNext(new DoublyDirectedNode<>(i));
+            current.setNext(new DoublyLinkedElement<>(i));
             current.getNext().setPrevious(current);
             current = current.getNext();
         }
@@ -26,7 +26,7 @@ public class CircleOfDeath {
 
     }
 
-    public DoublyDirectedNode<Integer> getHead() {
+    public DoublyLinkedElement<Integer> getHead() {
         return head;
     }
 
