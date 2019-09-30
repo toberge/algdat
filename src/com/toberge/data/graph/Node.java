@@ -4,18 +4,25 @@ import java.util.LinkedList;
 
 public class Node {
     private LinkedList<Edge> edges = null;
+    private int index;
 
     public Node() {
     }
 
-    /**
-     * Clone constructor that <em>should not</em>
-     * be used outside of BFS/DFS-esque operations
-     * since the edges are preserved
-     * @param node
-     */
-    public Node(Node node) {
+    public Node(int index) {
+        this.index = index;
+    }
+
+    /*public Node(Node node) {
         this.edges = node.edges;
+    }*/
+
+    public int getIndex() {
+        return index;
+    }
+
+    public boolean hasEdges() {
+        return !(edges == null || edges.size() == 0); // TODO possible NULL
     }
 
     public LinkedList<Edge> getEdges() {
@@ -26,6 +33,7 @@ public class Node {
         if (edges == null) {
             edges = new LinkedList<>();
         }
-        edges.add(new Edge(to));
+        // TODO decide first or last
+        edges.addFirst(new Edge(to));
     }
 }

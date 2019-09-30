@@ -2,33 +2,54 @@ package com.toberge.data.graph;
 
 import com.toberge.data.Queue;
 
+import java.io.File;
 import java.util.LinkedList;
 
 public class BFSTree {
 
-    private LinkedList<BFSNode> bfsNodes;
+//    private LinkedList<BFSNode> bfsNodes;
+    private Graph graph;
     private BFSNode root;
 
     /**
      * This is just like doing a BFS
      * but since it initializes a tree structure,
      * I can just as well make it the constructor.
-     * @param graph
+     * @param file
      * @param start
      */
-    public BFSTree(Graph graph, Node start) {
+    public BFSTree(File file, int start) {
 
-        bfsNodes = new LinkedList<>();
-        for (Object node : graph.getNodes()) {
+        graph = Graph.readFromFile(file, i -> (Node) new BFSNode(i));
+
+        /*Graph<BFSNode> bfsGraph = new Graph<>();
+        for (Node node : graph.getNodes()) {
+            BFSNode newborn = new BFSNode(node.getIndex());
+            bfsGraph.addNode(newborn);
+            if (bfsGraph.getNodes().get(newborn.getIndex()) != newborn) {
+                System.err.println("FUCK");
+                System.exit(1);
+            }
             if (node != start) {
                 bfsNodes.add(new BFSNode(start));
             }
+
         }
+        for (BFSNode node : bfsGraph.getNodes()) {
+            // TODO here or elsewhere?
+        }*/
+
+        root = performBFS(graph, start);
+
+    }
+
+    public static BFSNode performBFS(Graph graph, int start) {
         // initialize start node
-        root = new BFSNode(start);
+        //root = new BFSNode(start);
+        BFSNode root = (BFSNode) graph.getNodes().get(start);
         root.setDistance(0);
         // assemble queue
-        Queue<BFSNode> queue = new Queue<>(bfsNodes.size() - 1);
+        Queue<BFSNode> queue = new Queue<>(graph.getN() - 1);
         queue.put(root);
         while (!queue.isEmpty()) {
             BFSNode node = queue.getNext();
@@ -45,5 +66,21 @@ public class BFSTree {
                 }
             }
         }
+        return root;
+    }
+
+    public Graph getGraph() {
+        return graph;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder(" Node \tParent\tDistance");
+        builder.append(System.lineSeparator());
+        for (Object node: graph.getNodes()) {
+            builder.append(node);
+            builder.append(System.lineSeparator());
+        }
+        return builder.toString();
     }
 }
