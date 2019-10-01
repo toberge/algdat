@@ -20,7 +20,7 @@ public class BFSTree {
      */
     public BFSTree(File file, int start) {
 
-        graph = Graph.readFromFile(file, i -> (Node) new BFSNode(i));
+        graph = GraphFactory.readFromFile(file, BFSNode::new);
 
         /*Graph<BFSNode> bfsGraph = new Graph<>();
         for (Node node : graph.getNodes()) {
