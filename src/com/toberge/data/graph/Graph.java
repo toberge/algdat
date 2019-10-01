@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Graph<T extends Node> {
     private int N = 0, E = 0;
-    private LinkedList<T> nodes = new LinkedList<>();
+    private List<T> nodes = new ArrayList<>();
 
     public Graph() {
 
@@ -15,7 +15,6 @@ public class Graph<T extends Node> {
         if (n != nodes.length) throw new IllegalArgumentException("Warning: n =/= nodes.length, something's off!");
         N = n;
         E = e;
-        this.nodes = new LinkedList<>();
         Collections.addAll(this.nodes, nodes);
     }
 
@@ -23,7 +22,7 @@ public class Graph<T extends Node> {
 
     }
 
-    public LinkedList<T> getNodes() {
+    public List<T> getNodes() {
         return nodes;
     }
 

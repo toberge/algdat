@@ -3,11 +3,9 @@ package com.toberge.data.graph;
 import com.toberge.data.Queue;
 
 import java.io.File;
-import java.util.LinkedList;
 
 public class BFSTree {
 
-//    private LinkedList<BFSNode> bfsNodes;
     private Graph graph;
     private BFSNode root;
 

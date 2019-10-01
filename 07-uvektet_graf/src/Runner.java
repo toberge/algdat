@@ -31,6 +31,12 @@ public class Runner {
 
         bfsTree = new BFSTree(new File("07-uvektet_graf/L7g1"), 5);
         System.out.println(bfsTree);
+        bfsTree = new BFSTree(new File("07-uvektet_graf/L7g2"), 5);
+        System.out.println(bfsTree);
+//        bfsTree = new BFSTree(new File("07-uvektet_graf/L7g3"), 5);
+//        System.out.println(bfsTree);
+        bfsTree = new BFSTree(new File("07-uvektet_graf/L7g5"), 5);
+        System.out.println(bfsTree);
 
 
         System.out.println("Veikryss mellom Drammen og helsinki (distance - 1): " +
