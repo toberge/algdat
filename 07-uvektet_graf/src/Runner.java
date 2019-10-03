@@ -85,9 +85,7 @@ public class Runner {
     }
 
     public static void main(String[] args) {
-        // load graphs
-        // run BFS (on copy)
-        // run topo sort (on copy)
+        // BFS
 
         bfsTree = new BFSTree(new File("07-uvektet_graf/L7g1"), 5);
         System.out.println(bfsTree);
@@ -98,15 +96,21 @@ public class Runner {
         bfsTree = new BFSTree(new File("07-uvektet_graf/L7g5"), 5);
         System.out.println(bfsTree);
 
+        // TOPO
+
         Graph<Node> graph = GraphFactory.readFromFile(new File("07-uvektet_graf/L7g5"));
         topoOrder(graph);
         topoOrder2(graph);
         topoOrder3(graph);
 
+        // TOPO OF CYCLIC GRAPH
+
         graph = GraphFactory.readFromFile(new File("07-uvektet_graf/L7g3"));
         topoOrder(graph);
         topoOrder2(graph);
         topoOrder3(graph);
+
+        // MORE BFS
 
         Scanner scanner = new Scanner(System.in);
 
@@ -133,8 +137,6 @@ public class Runner {
                 }
             });
         }
-
-
 
     }
 }

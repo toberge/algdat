@@ -15,10 +15,6 @@ public class Node {
         this.index = index;
     }
 
-    /*public Node(Node node) {
-        this.edges = node.edges;
-    }*/
-
     public Metadata getMetadata() {
         return metadata;
     }

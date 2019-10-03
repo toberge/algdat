@@ -5,11 +5,6 @@ public class BFSNode extends Node {
     private BFSNode parent = null;
     private int distance = PSEUDO_INFINITY;
 
-    /*// clone constructor
-    public BFSNode(Node node) {
-        super(node);
-    }*/
-
     public BFSNode(int i) {
         super(i);
     }
