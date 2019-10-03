@@ -6,6 +6,8 @@ public class Node {
     private LinkedList<Edge> edges = null;
     private int index;
 
+    private Metadata metadata;
+
     public Node() {
     }
 
@@ -16,6 +18,14 @@ public class Node {
     /*public Node(Node node) {
         this.edges = node.edges;
     }*/
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
+    }
 
     public int getIndex() {
         return index;

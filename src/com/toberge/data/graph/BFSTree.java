@@ -20,23 +20,6 @@ public class BFSTree {
 
         graph = GraphFactory.readFromFile(file, BFSNode::new);
 
-        /*Graph<BFSNode> bfsGraph = new Graph<>();
-        for (Node node : graph.getNodes()) {
-            BFSNode newborn = new BFSNode(node.getIndex());
-            bfsGraph.addNode(newborn);
-            if (bfsGraph.getNodes().get(newborn.getIndex()) != newborn) {
-                System.err.println("FUCK");
-                System.exit(1);
-            }
-            if (node != start) {
-                bfsNodes.add(new BFSNode(start));
-            }
-
-        }
-        for (BFSNode node : bfsGraph.getNodes()) {
-            // TODO here or elsewhere?
-        }*/
-
         root = performBFS(graph, start);
 
     }
@@ -69,6 +52,10 @@ public class BFSTree {
 
     public Graph getGraph() {
         return graph;
+    }
+
+    public BFSNode getRoot() {
+        return root;
     }
 
     @Override
