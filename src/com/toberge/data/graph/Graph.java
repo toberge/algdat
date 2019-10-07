@@ -1,10 +1,18 @@
-    package com.toberge.data.graph;
+package com.toberge.data.graph;
+
+
+import com.toberge.data.Queue;
 
 import java.util.*;
 
 public class Graph<T extends Node> {
     private int N = 0, E = 0;
     private List<T> nodes = new ArrayList<>();
+    private MetadataType metadataType = MetadataType.NONE;
+
+    private enum MetadataType {
+        BFS, DFS, TOPO, NONE
+    }
 
     public Graph() {
 
@@ -36,10 +44,52 @@ public class Graph<T extends Node> {
         }
     }
 
-    private void initTopo() {
-        for (T node : nodes) {
-            node.setMetadata(new TopoData());
+    private void initMetadata(MetadataType type) {
+        switch (type) {
+            case BFS:
+                for (T node : nodes) {
+                    node.setMetadata(new BFSData());
+                }
+                metadataType = MetadataType.BFS;
+                break;
+            case TOPO:
+                for (T node : nodes) {
+                    node.setMetadata(new TopoData());
+                }
+                metadataType = MetadataType.TOPO;
+                break;
+            case NONE:
+                for (T node : nodes) {
+                    node.setMetadata(null);
+                }
+                metadataType = MetadataType.NONE;
+            default:
+                break;
         }
+    }
+
+    public Node bfs(Node start) {
+        initMetadata(MetadataType.BFS);
+        ((BFSData)start.getMetadata()).setDistance(0);
+        // assemble queue
+        Queue<Node> queue = new Queue<>(N - 1);
+        queue.put(start);
+        while (!queue.isEmpty()) {
+            Node node = queue.getNext();
+            if (!node.hasEdges()) continue;
+            for (Edge edge : node.getEdges()) {
+                // find neighbouring node
+                Node neighbor = edge.getTo();
+                BFSData data = (BFSData) neighbor.getMetadata();
+                if (data.getDistance() == BFSNode.PSEUDO_INFINITY) {
+                    // set distance if unset
+                    data.setDistance(((BFSData) node.getMetadata()).getDistance() + 1);
+                    data.setParent(node);
+                    queue.put(neighbor);
+                }
+            }
+        }
+        return start;
     }
 
     private Node topoDFS(Node start, Node currentResultHead) {
@@ -61,12 +111,12 @@ public class Graph<T extends Node> {
     }
 
     public Node topoSort() {
-       initTopo();
-       Node currentResultHead = null;
-       for (Node node : nodes) {
+        initMetadata(MetadataType.TOPO);
+        Node currentResultHead = null;
+        for (Node node : nodes) {
            currentResultHead = topoDFS(node, currentResultHead);
-       }
-       return currentResultHead;
+        }
+        return currentResultHead;
     }
 
     private void topoDFS2(Node start, LinkedList<Node> order, HashMap<Node, Boolean> visited) {
@@ -114,5 +164,12 @@ public class Graph<T extends Node> {
             topoDFS3(node, order, visited);
         }
         return order;
+    }
+
+
+    @Override
+    public String toString() {
+        // TODO BFS-stuff when that is done
+        return super.toString();
     }
 }
