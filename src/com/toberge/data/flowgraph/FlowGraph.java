@@ -8,7 +8,7 @@ import java.util.*;
 
 public class FlowGraph {
 
-    public static final int INFINITY = FlowNode.INFINITY;
+    public static final int INFINITY = 1000232323;
 
     private LinkedList<FlowEdge>[] nodes;
 
