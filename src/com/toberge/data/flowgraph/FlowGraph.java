@@ -87,10 +87,21 @@ public class FlowGraph {
      */
     public String edmondsKarp(int source, int sink) {
 
+        // initializing variables
         int increase, maxFlow = 0;
-        StringBuilder builder = new StringBuilder("Max flow from " + source + " to " + sink + " with Edmonds-Karp");
+        StringBuilder builder = new StringBuilder("Finding max flow from " + source + " to " + sink + " with Edmonds-Karp");
         builder.append(System.lineSeparator());
         builder.append("Increase ; Augmenting path");
+
+        // just some extra information
+        int toSink = 0, fromSource = 0;
+        for (FlowEdge edge : nodes[sink]) {
+            toSink += edge.getOppositeEdge().getCapacity();
+        }
+        for (FlowEdge edge : nodes[source]) {
+            fromSource += edge.getCapacity();
+        }
+        System.out.println("Absolute max flow = { to sink: " + toSink + ", from source: " + fromSource + " }");
 
         do {
             builder.append(System.lineSeparator());
