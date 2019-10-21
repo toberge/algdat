@@ -1,86 +1,94 @@
-import com.toberge.data.Queue;
-import com.toberge.data.thatgraph.Edge;
-import com.toberge.data.thatgraph.Graph;
-import com.toberge.data.thatgraph.Node;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 
-import java.util.Scanner;
-
-@Deprecated
+/**
+ * Do note that dominoes are numbered from 1 to n in input!
+ */
 public class Dominoes2 {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int cases = scanner.nextInt();
-        int[] counts = new int[cases];
-        scanner.nextLine();
-        for (int i = 0; i < cases; i++) {
-            int dominoes = scanner.nextInt(),
-                   edges = scanner.nextInt(),
-                 topples = scanner.nextInt();
-            int fallen = 0;
-            Graph graph = new Graph();
-            scanner.nextLine();
-            // initialize graph
-            for (int j = 0; j < dominoes; j++) {
-                graph.addNode(new Domino(j+1, null));
-            }
-            // read domino relations
-            for (int j = 0; j < edges; j++) {
-                int fromi = scanner.nextInt() - 1;
-                int toi = scanner.nextInt() - 1;
-                Domino from = (Domino) graph.getNodes().get(fromi);
-                from.addEdge(graph.getNodes().get(toi));
-                scanner.nextLine();
-            }
-            // read toppling status
-            Domino[] toppled = new Domino[topples];
-            for (int j = 0; j < topples; j++) {
-                toppled[i] = (Domino) graph.getNodes().get(scanner.nextInt() - 1);
-                toppled[i].topple();
-                fallen++;
-                scanner.nextLine();
-            }
 
-            Queue<Domino> queue = new Queue<>(dominoes * 2);
-            for (Domino domino:
-                 toppled) {
-                queue.put(domino);
-            }
-            while (!queue.isEmpty()) {
-                Domino domino = queue.getNext();
-                domino.topple();
-                //fallen++;
-                for (Edge edge = domino.getFirstEdge(); edge != null; edge = edge.getNext()) {
-                    Domino adjacent = ((Domino) edge.getTo());
-                    if (!adjacent.hasFallen()) {
-                        adjacent.topple();
-                        fallen++;
-                        queue.put(adjacent);
-                    }
+    private LinkedList<Integer>[] dominoes;
+    private boolean[] toppled;
+    private int toppleCount = 0;
+
+    private int dominoCount;
+    private int edgeCount;
+    private int manualToppleCount;
+
+    public Dominoes2(BufferedReader br) throws IOException {
+        StringTokenizer st = new StringTokenizer(br.readLine()); // entire damn file
+        dominoCount = Integer.parseInt(st.nextToken());
+        edgeCount = Integer.parseInt(st.nextToken());
+        manualToppleCount = Integer.parseInt(st.nextToken());
+
+        // initialize
+        dominoes = new LinkedList[dominoCount];
+        toppled = new boolean[dominoCount];
+        for (int i = 0; i < dominoCount; i++) {
+            dominoes[i] = new LinkedList<>();
+            toppled[i] = false;
+        }
+
+        // read edges
+        for (int i = 0; i < edgeCount; i++) {
+            st = new StringTokenizer(br.readLine());
+            int from = Integer.parseInt(st.nextToken());
+            int to = Integer.parseInt(st.nextToken());
+            dominoes[from - 1].addFirst(to - 1);
+        }
+
+        // topple as requested
+        for (int i = 0; i < manualToppleCount; i++) {
+            performTopple(Integer.parseInt(br.readLine()) - 1);
+        }
+
+        // count topples
+        for (boolean topple : toppled) {
+            if (topple) toppleCount++;
+        }
+    }
+
+    /**
+     * BFS traversal of graph to topple dominoes
+     * DFS could have worked too
+     * @param start: domino to topple
+     */
+    private void performTopple(int start) {
+        ArrayDeque<Integer> queue = new ArrayDeque<>(dominoCount / 2);
+        queue.add(start);
+
+        while (!queue.isEmpty()) {
+            int domino = queue.poll();
+            toppled[domino] = true;
+            for (int neighbor : dominoes[domino]) {
+                if (!toppled[neighbor]) {
+                    queue.add(neighbor);
                 }
             }
-
-            counts[i] = fallen;
-        }
-        for (int count : counts) {
-            System.out.println(count);
         }
     }
-}
 
-class Domino extends Node {
-    private boolean fallen = false;
-    private int id;
-
-    public Domino(int id, Edge firstEdge) {
-        super(firstEdge);
-        this.id = id;
+    public int getToppleCount() {
+        return toppleCount;
     }
 
-    public void topple() {
-        fallen = true;
-    }
+    public static void main(String[] args) {
 
-    public boolean hasFallen() {
-        return fallen;
+        try (InputStreamReader fr = new InputStreamReader(System.in);
+             BufferedReader br = new BufferedReader(fr)) {
+
+            int testCases = Integer.parseInt(br.readLine());
+            for (int i = 0; i < testCases; i++) {
+                Dominoes2 dominoes2 = new Dominoes2(br);
+                System.out.println(dominoes2.getToppleCount());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
