@@ -11,6 +11,8 @@ public class BitString {
 
     // TODO method for joining byte[]
 
+    // these methods kinda don't work and aren't used, so scrap them?
+
     // it SHOULD work
     public byte appendToByte(byte base, byte used) {
         long temp = bits >> (length - 8 - used); // shift away all else than what we append
@@ -49,6 +51,8 @@ public class BitString {
             }
             bstring.append(base);
             base = bstring.toString();
+        } else if (base.length() > length) {
+            base = base.substring(base.length() - length, base.length() - 1);
         }
         return base;
     }

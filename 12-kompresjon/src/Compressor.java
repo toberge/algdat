@@ -1,5 +1,9 @@
+import sun.awt.image.ImageWatched;
+
 import java.io.*;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Compressor {
@@ -44,11 +48,11 @@ public class Compressor {
     }
 
     // this thing should work. only problem is TODO this is the decoding!!!!!!!!!!!!!!!!!!!!!!!! except it's not... quite... right...
-    private static List<BitString> huffMyPuff(HuffmanTree tree, DataInputStream stream) throws IOException {
-        List<BitString> list = new ArrayList<>();
+    private static LinkedList<BitString> huffMyPuff(HuffmanTree tree, DataInputStream stream) throws IOException {
+        LinkedList<BitString> list = new LinkedList<>();
         BitString[] valueToBitString = new BitString[BLOCK_SIZE];
 
-        while (stream.available() > 0) { // useless outer while loop
+        while (stream.available() > 0) { // useless outer while loop, much sorry
             byte[] bytes = new byte[stream.available()];
             stream.read(bytes);
             HuffmanNode currentNode = tree.getRoot();
@@ -89,9 +93,9 @@ public class Compressor {
         return list;
     }
 
-    private static List<BitString> encodeToList(DataInputStream stream, HuffmanTree tree) throws IOException {
+    private static LinkedList<BitString> encodeToList(DataInputStream stream, HuffmanTree tree) throws IOException {
         BitString[] bsMap = new BitString[BLOCK_SIZE];
-        List<BitString> list = new ArrayList<>();
+        LinkedList<BitString> list = new LinkedList<>();
 
         byte[] bytes = new byte[stream.available()];
         stream.read(bytes);
@@ -108,7 +112,8 @@ public class Compressor {
         return list;
     }
 
-    private static byte[] toByteArray(List<BitString> list) {
+    @Deprecated
+    private static byte[] toNoByteArray(List<BitString> list) {
         ArrayList<Byte> bytes = new ArrayList<>();
         byte toFill = 0; // to fill in most recent byte
 
@@ -151,6 +156,44 @@ public class Compressor {
         return result;
     }
 
+    private static byte[] toByteArray(LinkedList<BitString> list) {
+        ArrayList<Byte> bytes = new ArrayList<>();
+
+        byte progress = 0;
+        while (list.size() > 0) {
+            byte b = 0; // let's get ourselves a byte
+            // all 8 bits of the byte
+            for (byte i = 0; i < 8; i++) { // dumb me did i < 7 for a while
+                BitString bitString = list.getFirst(); // get bitstring
+                /* Example:
+                000000...101101
+                         ^
+                get it by & (1 << length - index)
+                 */
+                if ((list.getFirst().bits & (1 << (bitString.length - progress - 1))) != 0) {
+                    // is a 1
+                    b |= (1 << (8-i-1));
+                } // else 0, no need to do anything
+                progress++; // move rightwards in bits
+                if (progress >= bitString.length) { // if empty
+                    list.removeFirst(); // remove 1st so we get 2nd next time
+                    if (list.size() == 0) break; // leave for loop if list is empty
+                    progress = 0; // reset progress
+                }
+            }
+            bytes.add(b);
+        }
+
+        byte[] result = new byte[bytes.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = bytes.get(i);
+        }
+
+        System.out.println(bytes.size());
+
+        return result;
+    }
+
     private static void write(OutputStream stream, byte[] bytes) throws IOException {
     }
 
@@ -181,25 +224,16 @@ public class Compressor {
 
 
         // TODO move dis part 2 dat decompressor u know & love
-        List<BitString> list = null;
-/*        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample.txt")));
-             DataInputStream stream = new DataInputStream(bufferedInputStream)) {
-            list = huffMyPuff(tree, stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (BitString bs : list) {
-            System.out.print(bs + " ");
-        }
-        System.out.println();*/
 
-        // TODO this might not work I dunno
+        // get compressed values
+        LinkedList<BitString> list = null;
         try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample.txt")));
              DataInputStream stream = new DataInputStream(bufferedInputStream)) {
             list = encodeToList(stream, tree);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.print("Compressed: ");
         for (BitString bs : list) {
             System.out.print(bs + " ");
         }
@@ -207,8 +241,9 @@ public class Compressor {
 
         // convert to array
         byte[] toWrite = toByteArray(list);
+        System.out.print("To bytes: ");
         for (byte b : toWrite) {
-            System.out.print(new BitString(b, (byte) 8) + " ");
+            System.out.print(new BitString(Byte.toUnsignedInt(b), (byte) 8) + " ");
         }
         System.out.println();
 
@@ -218,7 +253,29 @@ public class Compressor {
         System.out.println(bs + " and then " + bs.appendToByte((byte)0b11000000, (byte)2) + Integer.toBinaryString(Byte.toUnsignedInt((new BitString(0b101111110101L, (byte)12)).splitByte((byte) 2))));
 
         // use tree to write compressed file
-        try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File("12-kompresjon/out.txt"))))) {
+        try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File("12-kompresjon/sample.huff"))))) {
+            outputStream.write(toWrite);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // decompression test - TODO fix & move
+        System.out.println("decompressed shit:");
+        LinkedList<BitString> dlist = null;
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample.huff")));
+             DataInputStream stream = new DataInputStream(bufferedInputStream)) {
+            dlist = huffMyPuff(tree, stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (BitString bss : dlist) {
+            System.out.print(bss + " ");
+        }
+        System.out.println();
+
+        toWrite = toByteArray(dlist);
+
+        try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File("12-kompresjon/sample.huff.unhuff"))))) {
             outputStream.write(toWrite);
         } catch (IOException e) {
             e.printStackTrace();
