@@ -4,12 +4,13 @@ import java.util.LinkedList;
 
 public class HuffmanToolkit {
 
-    private static final short BLOCK_SIZE = 256;
+    private static final short VALUE_RANGE = 256;
     private static final short JUMP_LENGTH = 32;
+    private static final byte VERSION_BYTE = 22;
 
     private static int[] generateFrequencyTable(DataInputStream stream) throws IOException {
-        int[] frequencyTable = new int[BLOCK_SIZE];
-        for (int i = 0; i < BLOCK_SIZE; i++) {
+        int[] frequencyTable = new int[VALUE_RANGE];
+        for (int i = 0; i < VALUE_RANGE; i++) {
             frequencyTable[i] = 0;
         }
         byte[] array = new byte[stream.available()];
@@ -39,12 +40,8 @@ public class HuffmanToolkit {
         }
     }
 
-    private static byte[] decodeToBytes(HuffmanTree tree, DataInputStream stream) throws IOException {
+    private static byte[] decodeToBytes(HuffmanTree tree, byte[] input) {
         ArrayList<Byte> bytes = new ArrayList<>();
-
-        byte[] input = new byte[stream.available()];
-        stream.read(input);
-
         HuffmanNode currentNode = tree.getRoot();
 
         for (byte b : input) {
@@ -73,7 +70,7 @@ public class HuffmanToolkit {
 
     // using tree to get zem codes
     private static LinkedList<BitString> encodeToBitStrings(DataInputStream stream, HuffmanTree tree) throws IOException {
-        BitString[] bsMap = new BitString[BLOCK_SIZE];
+        BitString[] bsMap = new BitString[VALUE_RANGE];
         LinkedList<BitString> list = new LinkedList<>();
 
         byte[] bytes = new byte[stream.available()];
@@ -129,11 +126,11 @@ public class HuffmanToolkit {
         return result;
     }
 
-    public static boolean compress(String filename) {
+    public static boolean compress(File inFile, File outFile) {
 
         // generate freq table
         int[] frequencyTable;
-        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File(filename)));
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(inFile));
              DataInputStream stream = new DataInputStream(bufferedInputStream)) {
             frequencyTable = generateFrequencyTable(stream);
         } catch (IOException e) {
@@ -146,7 +143,7 @@ public class HuffmanToolkit {
 
         // get compressed values
         LinkedList<BitString> huffmanCodes;
-        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File(filename)));
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(inFile));
              DataInputStream stream = new DataInputStream(bufferedInputStream)) {
             huffmanCodes = encodeToBitStrings(stream, tree);
         } catch (IOException e) {
@@ -160,8 +157,47 @@ public class HuffmanToolkit {
         // TODO byte with num bits not written, then int with num values and the frequency table, write that before compressed data.
 
         // use tree to write compressed file
-        try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(filename))))) {
+        try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outFile)))) {
+            // write version byte
+            outputStream.writeByte(VERSION_BYTE);
+            // write freq table
+            for (int e : frequencyTable) {
+                outputStream.writeInt(e);
+            }
             outputStream.write(compressedBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean decompress(File inFile, File outFile) {
+
+        int[] frequencyTable = new int[VALUE_RANGE];
+        byte[] input;
+        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(new FileInputStream(inFile)))) {
+            if (stream.readByte() != VERSION_BYTE) {
+                System.err.println("Invalid version byte");
+                return false;
+            }
+            for (int i = 0; i < VALUE_RANGE; i++) {
+                frequencyTable[i] = stream.readInt();
+            }
+            // the rest is compressed data
+            input = new byte[stream.available()];
+            stream.readFully(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        HuffmanTree tree = new HuffmanTree(frequencyTable);
+        byte[] toWrite = decodeToBytes(tree, input);
+
+        try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outFile)))) {
+            outputStream.write(toWrite);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -173,7 +209,7 @@ public class HuffmanToolkit {
     public static void main(String[] args) {
         // generate freq table
         int[] frequencyTable = null;
-        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample.txt")));
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample")));
              DataInputStream stream = new DataInputStream(bufferedInputStream)) {
             frequencyTable = generateFrequencyTable(stream);
         } catch (IOException e) {
@@ -193,7 +229,7 @@ public class HuffmanToolkit {
 
         // get compressed values
         LinkedList<BitString> list = null;
-        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample.txt")));
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample")));
              DataInputStream stream = new DataInputStream(bufferedInputStream)) {
             list = encodeToBitStrings(stream, tree);
         } catch (IOException e) {
@@ -213,10 +249,12 @@ public class HuffmanToolkit {
         // decompression test - TODO fix & move
         try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File("12-kompresjon/sample.huff")));
              DataInputStream stream = new DataInputStream(bufferedInputStream)) {
-            toWrite = decodeToBytes(tree, stream);
+            stream.readFully(toWrite);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        toWrite = decodeToBytes(tree, toWrite);
         for (byte b : toWrite) {
             System.out.print(new BitString(Byte.toUnsignedInt(b), (byte) 8) + " ");
         }

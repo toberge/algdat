@@ -3,6 +3,6 @@ out/**
 *.iml
 .idea/**
 07-uvektet_graf/L7Sk*
-12-kompresjon/out.txt
-12-kompresjon/decomp.txt
 12-kompresjon/*.huff*
+12-kompresjon/diverse*
+12-kompresjon/opg12*
