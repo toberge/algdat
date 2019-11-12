@@ -2,6 +2,9 @@ import java.util.ArrayList;
 
 public class HuffmanTree {
 
+    public static final int END_OF_BLOCK_VALUE = Integer.MAX_VALUE;
+    static final HuffmanNode END_OF_BLOCK_NODE = new HuffmanNode(1, END_OF_BLOCK_VALUE);
+
     private final HuffmanNode root;
     private final HuffmanNode[] valueToNode; // index is unsigned value
 
@@ -16,7 +19,8 @@ public class HuffmanTree {
                 valueToNode[i] = null;
             }
         }
-        nodes.toArray();
+        // special node for EOF handling
+        nodes.add(END_OF_BLOCK_NODE);
 
         while (nodes.size() > 1) {
             // sort
@@ -59,11 +63,18 @@ public class HuffmanTree {
     }
 
     public BitString encode(int value) {
-        if (value > valueToNode.length || valueToNode[value] == null) return null;
-        HuffmanNode node = valueToNode[value];
+        HuffmanNode node;
+        if (value == END_OF_BLOCK_VALUE) {
+            node = END_OF_BLOCK_NODE; // special handling for end value
+        } else if (value > valueToNode.length || valueToNode[value] == null) {
+            return null;
+        } else {
+            node = valueToNode[value]; // created in constructor
+        }
+
         long code = 0;
         byte bitCount = 0;
-        while (node.parent != null) {
+        while (node.parent != null) { // start walking tree
             if (node.parent.leftChild == node) {
                 // we're a 0
                 // leaving a 0, no need to do more

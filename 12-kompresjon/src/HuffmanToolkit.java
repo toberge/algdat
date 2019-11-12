@@ -44,6 +44,7 @@ public class HuffmanToolkit {
         ArrayList<Byte> bytes = new ArrayList<>();
         HuffmanNode currentNode = tree.getRoot();
 
+        out:
         for (byte b : input) {
             for (int i = 0; i < 8; i++) { // for each bit
                 if ((b & (1 << (8-i-1))) != 0) { // is a 1
@@ -54,6 +55,9 @@ public class HuffmanToolkit {
 
                 if (currentNode.leaf) { // found value
                     int value = currentNode.value;
+                    if (value == HuffmanTree.END_OF_BLOCK_VALUE) {
+                        break out; // this is the last byte
+                    }
                     bytes.add((byte) value); // then we shall write that value
                     currentNode = tree.getRoot(); // and reset
                 }
@@ -84,6 +88,8 @@ public class HuffmanToolkit {
             }
             list.add(bsMap[value]);
         }
+        // end of "file"
+        list.add(tree.encode(HuffmanTree.END_OF_BLOCK_VALUE));
 
         return list;
     }
@@ -120,8 +126,6 @@ public class HuffmanToolkit {
         for (int i = 0; i < result.length; i++) {
             result[i] = bytes.get(i);
         }
-
-        System.out.println(bytes.size());
 
         return result;
     }
@@ -206,6 +210,7 @@ public class HuffmanToolkit {
         return true;
     }
 
+    // test method
     public static void main(String[] args) {
         // generate freq table
         int[] frequencyTable = null;

@@ -2,7 +2,11 @@ out/**
 05-hashtabell/navn
 *.iml
 .idea/**
+
+# way too big graph of Scandinavia
 07-uvektet_graf/L7Sk*
-12-kompresjon/*.huff*
+
+# compressed filelings
+**.huff*
 12-kompresjon/diverse*
 12-kompresjon/opg12*
