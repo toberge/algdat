@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Compressor {
+public class HuffmanToolkit {
 
     private static final short BLOCK_SIZE = 256;
     private static final short JUMP_LENGTH = 32;
@@ -127,6 +127,47 @@ public class Compressor {
         System.out.println(bytes.size());
 
         return result;
+    }
+
+    public static boolean compress(String filename) {
+
+        // generate freq table
+        int[] frequencyTable;
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File(filename)));
+             DataInputStream stream = new DataInputStream(bufferedInputStream)) {
+            frequencyTable = generateFrequencyTable(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        // generate Huffman tree
+        HuffmanTree tree = new HuffmanTree(frequencyTable);
+
+        // get compressed values
+        LinkedList<BitString> huffmanCodes;
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(new File(filename)));
+             DataInputStream stream = new DataInputStream(bufferedInputStream)) {
+            huffmanCodes = encodeToBitStrings(stream, tree);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        // convert to array
+        byte[] compressedBytes = bitStringsToBytes(huffmanCodes);
+
+        // TODO byte with num bits not written, then int with num values and the frequency table, write that before compressed data.
+
+        // use tree to write compressed file
+        try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(filename))))) {
+            outputStream.write(compressedBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
     public static void main(String[] args) {
