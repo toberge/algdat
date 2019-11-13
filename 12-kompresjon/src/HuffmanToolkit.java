@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class HuffmanToolkit {
@@ -80,16 +82,23 @@ public class HuffmanToolkit {
         byte[] bytes = new byte[stream.available()];
         stream.read(bytes);
 
+        byte maxlen = 0;
+
         for (byte b : bytes) {
             // nonneg value
             int value = Byte.toUnsignedInt(b);
             if (bsMap[value] == null) { // no cached value
                 bsMap[value] = tree.encode(value); // use tree to calc value
+                // TODO remove maybe
+                if (bsMap[value].length > maxlen) maxlen = bsMap[value].length;
             }
             list.add(bsMap[value]);
         }
         // end of "file"
         list.add(tree.encode(HuffmanTree.END_OF_BLOCK_VALUE));
+
+        // TODO remove maybe
+        System.out.println("Maximal length of Huffman code: " + maxlen);
 
         return list;
     }
@@ -158,8 +167,6 @@ public class HuffmanToolkit {
         // convert to array
         byte[] compressedBytes = bitStringsToBytes(huffmanCodes);
 
-        // TODO byte with num bits not written, then int with num values and the frequency table, write that before compressed data.
-
         // use tree to write compressed file
         try (DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outFile)))) {
             // write version byte
@@ -168,6 +175,7 @@ public class HuffmanToolkit {
             for (int e : frequencyTable) {
                 outputStream.writeInt(e);
             }
+            // then write the the compressed data
             outputStream.write(compressedBytes);
         } catch (IOException e) {
             e.printStackTrace();
