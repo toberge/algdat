@@ -3,7 +3,7 @@
 export CLASSPATH="$CLASSPATH:../out/production/12-kompresjon/"
 
 failed=0
-files=(sample diverse.{pdf,txt} opg12.{pdf,txt} "src/HuffmanToolkit.java" urandom)
+files=(sample diverse.{pdf,txt,lyx} opg12.{pdf,txt} "src/HuffmanToolkit.java" urandom)
 for file in ${files[*]}
 do
   echo "-----$file-----"
