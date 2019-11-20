@@ -115,16 +115,19 @@ public class MapGraph {
             // loop through edges to get neighbours
             for (MapEdge edge = node.firstEdge; edge != null; edge = edge.nextEdge) {
                 MapNode neighbour = edge.to;
-                // check what happens if this neighbour's path passes through current node
-                if (neighbour.distance > node.distance + edge.driveTime) {
-                    // if it's a better way, take it!
-                    neighbour.distance = node.distance + edge.driveTime;
-                    neighbour.parent = node;
+                if (!neighbour.found) { // if not already processed
+                    // check what happens if this neighbour's path passes through current node
+                    if (neighbour.distance > node.distance + edge.driveTime) {
+                        // if it's a better way, take it!
+                        neighbour.distance = node.distance + edge.driveTime;
+                        neighbour.parent = node;
+
+                        // now has a proper distance + estimate, will be properly placed in heap
+                        // gotta make sure it replaces any dupe and gets sorted according to its new distance
+                        heap.remove(neighbour);
+                        heap.add(neighbour);
+                    }
                 }
-                // now has a proper distance + estimate, will be properly placed in heap
-                if (neighbour.found) continue; // already processed TODO before or after if
-                heap.remove(neighbour); // TODO is this enoguh?
-                heap.add(neighbour);
             }
         }
     }

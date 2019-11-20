@@ -23,6 +23,8 @@ public class MapSearch {
         from = Integer.parseInt(args[2]);
         to = Integer.parseInt(args[3]);
 
+        System.out.println("From " + from + " to " + to);
+
 
         MapGraph graph = new MapGraph(nodeFile, edgeFile);
         Tester.setVerbose(true);
