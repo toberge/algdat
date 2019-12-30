@@ -7,16 +7,12 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * "Time limit exceeded"
- * TODO: determine if excessive queueing is a plausible cause
- *       (seems likely, given that only !leftUnion prevents queue adding)
+ * Solution to https://open.kattis.com/problems/brexit
  */
 public class Brexit {
     private List<Integer>[] partnerships;
     private boolean[] leftUnion;
-    // TODO do I need the examined array to improve performance?
-    //      (it has not worked yet...)
-    // private boolean[] examined;
+    private int[] leavingNeighbours;
 
     private final int countryCount; // 2≤C≤200000
     private final int partnershipCount; // 1≤P≤300000
@@ -33,7 +29,7 @@ public class Brexit {
         // initialize
         partnerships = new List[countryCount];
         leftUnion = new boolean[countryCount];
-        // examined = new boolean[countryCount];
+        leavingNeighbours = new int[countryCount];
         for (int i = 0; i < countryCount; i++) {
             partnerships[i] = new LinkedList<>();
         }
@@ -57,57 +53,37 @@ public class Brexit {
     public String leaveOrStay() {
         ArrayDeque<Integer> queue = new ArrayDeque<>(countryCount / 2);
         // Britain leaves the union and starts the chain reaction
+        //queue.addAll(partnerships[Britain]);
+        // ONLY BRITAIN NOW
+        queue.add(Britain);
         leftUnion[Britain] = true;
-        queue.addAll(partnerships[Britain]);
 
         while (!queue.isEmpty()) {
             int country = queue.poll();
 
-            /* NOT WORKING
-               (thought of this as *possible* optimization)
-            // if not already examined, add unvisited neighbours to queue
-            if (!examined[country]) {
-                for (int neighbour : partnerships[country]) {
-                    if (!examined[neighbour]) {
-                        queue.add(neighbour);
-                    }
+            // we know it shall leave!
+            // signal to all neighbours that we have left
+            for (int neighbour : partnerships[country]) {
+                leavingNeighbours[neighbour]++;
+                if (!leftUnion[neighbour] && shouldLeave(neighbour)) {
+                    // add to queue and make it leave!
+                    queue.add(neighbour);
+                    leftUnion[neighbour] = true;
                 }
-                examined[country] = true;
-            }
-
-            // if we should leave, leave.
-            leftUnion[country] = shouldLeave(country);
-            */
-
-            /* WORKING */
-            if (shouldLeave(country)) {
-                leftUnion[country] = true;
-                for (int neighbour : partnerships[country]) {
-                    if (!leftUnion[neighbour]) {
-                        queue.add(neighbour);
-                    }
-                }
-            } // END if(shouldLeave)
+            } // END FOR
         } // END WHILE
 
         return leftUnion[homeCountry] ? "leave" : "stay";
     }
 
+    /**
+     * Leave if >= half of neighbours have left
+     */
     private boolean shouldLeave(int country) {
-        int neighboursOutside = 0;
-        for (int neighbour : partnerships[country]) {
-            // accidentally flipped the logic here...
-            if (leftUnion[neighbour]) {
-                neighboursOutside++;
-            }
-        }
-        // pure integer division? corrected? who knows...
-        //return neighboursOutside >= partnerships[country].size() / 2;
-        return neighboursOutside >= (int) (partnerships[country].size() / 2.0 + 0.5);
+        return leavingNeighbours[country] >= (int) (partnerships[country].size() / 2.0 + 0.5);
     }
 
     public static void main(String[] args) {
-
         try (InputStreamReader fr = new InputStreamReader(System.in);
              BufferedReader br = new BufferedReader(fr)) {
 
@@ -117,6 +93,5 @@ public class Brexit {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
